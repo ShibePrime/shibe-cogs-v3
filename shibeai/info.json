@@ -1,0 +1,10 @@
+{
+    "author" : ["Shibe"],
+    "install_msg" : "ai",
+    "name" : "ai",
+    "short" : "ai talk",
+    "requirements" : [],
+    "description" : "talkls to ai",
+    "permissions" : [""],
+    "tags" : [""]
+}
