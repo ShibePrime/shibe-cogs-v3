@@ -1,8 +1,4 @@
-# This init is required for each cog.
-# Import your main class from the cog's folder.
-from .ai import ai
-
+from .ai import AICommand
 
 def setup(bot):
-    # Add the cog to the bot.
-    bot.add_cog(ai())
+    bot.add_cog(AICommand(bot))
