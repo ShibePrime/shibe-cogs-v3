@@ -106,3 +106,13 @@ class AICommand(commands.Cog, name="AICommand"):
         """
         self.system_prompt = prompt
         await ctx.send("AI system prompt has been updated.")
+        
+    @commands.is_owner()    
+    @commands.command(name="aipurge")
+    async def ai_purge(self, ctx):
+        """
+        Deletes all .json file chat histories.
+        """
+        for file in self.chat_history_dir.glob('*.json'):
+            file.unlink()
+        await ctx.send("All chat histories have been deleted.")
