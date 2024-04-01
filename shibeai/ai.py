@@ -24,7 +24,7 @@ class AICommand(commands.Cog, name="AICommand"):
     def get_user_chat_history_file_path(self, user_id: int) -> Path:
         return self.chat_history_dir / f"{user_id}.json"
 
-    def update_chat_history(self, user_id: int, message: str):
+    def update_chat_history(self, user_id: int, user_message: str, ai_response: str):
         file_path = self.get_user_chat_history_file_path(user_id)
         if file_path.exists():
             with open(file_path, "r") as file:
@@ -32,7 +32,9 @@ class AICommand(commands.Cog, name="AICommand"):
         else:
             history = {"messages": []}
 
-        history["messages"].append({"role": "user", "content": message})
+        # Update history with user message and AI response
+        history["messages"].append({"role": "user", "content": user_message})
+        history["messages"].append({"role": "bot", "content": ai_response})
         history["messages"] = history["messages"][-50:]  # Keep only the last 50 messages
 
         with open(file_path, "w") as file:
@@ -46,10 +48,8 @@ class AICommand(commands.Cog, name="AICommand"):
         else:
             history = {"messages": [{"role": "system", "content": self.system_prompt}]}
 
-        history["messages"].append({"role": "user", "content": user_content})
-
         payload = {
-            "messages": history["messages"],
+            "messages": history["messages"] + [{"role": "user", "content": user_content}],
             "temperature": 0.7,
             "max_tokens": 150,
             "stream": False
@@ -59,7 +59,7 @@ class AICommand(commands.Cog, name="AICommand"):
             if response.status == 200:
                 data = await response.json()
                 ai_response = data.get('choices', [{}])[0].get('message', {}).get('content', 'Error: Could not parse AI response.')
-                self.update_chat_history(user_id, ai_response)  # Update history with AI response
+                self.update_chat_history(user_id, user_content, ai_response)  # Update history with AI response
                 return ai_response
             else:
                 return 'Error: Failed to fetch response from AI.'
