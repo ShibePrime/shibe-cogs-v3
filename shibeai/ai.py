@@ -11,7 +11,6 @@ class AICommand(commands.Cog, name="AICommand"):
     def __init__(self, bot):
         self.bot = bot
         self.session = aiohttp.ClientSession()
-        # Load settings from environment variables or use placeholders
         self.ai_url = os.getenv("AI_ENDPOINT_URL", "http://placeholder.ai:5001/v1/chat/completions")
         self.system_prompt = os.getenv("AI_SYSTEM_PROMPT", "You are Shibebot, an AI made for the Thunderdoge gaming community. Keep responses short and funny.")
 
@@ -40,6 +39,19 @@ class AICommand(commands.Cog, name="AICommand"):
         """
         Ask Shibebot anything!
         """
+        await ctx.trigger_typing()
+        try:
+            ai_response = await self.fetch_ai_response(user_content)
+            await ctx.send(ai_response)
+        except Exception as e:
+            await ctx.send(f"Error: {str(e)}")
+
+    @commands.command(name="sai")
+    async def stealth_ai_command(self, ctx, *, user_content: str):
+        """
+        Stealthily ask Shibebot anything!
+        """
+        await ctx.message.delete()
         await ctx.trigger_typing()
         try:
             ai_response = await self.fetch_ai_response(user_content)
