@@ -34,7 +34,7 @@ class AICommand(commands.Cog, name="AICommand"):
 
         # Update history with user message and AI response
         history["messages"].append({"role": "user", "content": user_message})
-        history["messages"].append({"role": "bot", "content": ai_response})
+        history["messages"].append({"role": "assistant", "content": ai_response})  
         history["messages"] = history["messages"][-50:]  # Keep only the last 50 messages
 
         with open(file_path, "w") as file:
