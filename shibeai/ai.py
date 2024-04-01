@@ -43,7 +43,7 @@ class AICommand(commands.Cog, name="AICommand"):
         await ctx.trigger_typing()
         try:
             ai_response = await self.fetch_ai_response(user_content)
-            await ctx.send(embed=discord.Embed(description=ai_response, color=discord.Color.blue()))
+            await ctx.send(ai_response)
         except Exception as e:
             await ctx.send(f"Error: {str(e)}")
 
