@@ -40,36 +40,36 @@ class AICommand(commands.Cog, name="AICommand"):
         with open(file_path, "w") as file:
             json.dump(history, file)
 
-async def fetch_ai_response(self, user_id: int, user_content: str):
-    # Load existing chat history, if available
-    history_file_path = self.get_user_chat_history_file_path(user_id)
-    if history_file_path.exists():
-        with open(history_file_path, "r") as file:
-            history = json.load(file)
-        # Prepend the system prompt to the existing history for this interaction
-        history["messages"] = [{"role": "system", "content": self.system_prompt}] + history["messages"]
-    else:
-        # Initialize history with the system prompt if there's no history
-        history = {"messages": [{"role": "system", "content": self.system_prompt}]}
-
-    # Construct the payload with the updated history including the system prompt
-    payload = {
-        "messages": history["messages"] + [{"role": "user", "content": user_content}],
-        "temperature": 0.7,
-        "max_tokens": 150,
-        "stream": False
-    }
-
-    # Post request to AI endpoint with the constructed payload
-    async with self.session.post(self.ai_url, json=payload) as response:
-        if response.status == 200:
-            data = await response.json()
-            ai_response = data.get('choices', [{}])[0].get('message', {}).get('content', 'Error: Could not parse AI response.')
-            # Update chat history excluding the prepended system prompt for the next interactions
-            self.update_chat_history(user_id, user_content, ai_response)
-            return ai_response
+    async def fetch_ai_response(self, user_id: int, user_content: str):
+        # Load existing chat history, if available
+        history_file_path = self.get_user_chat_history_file_path(user_id)
+        if history_file_path.exists():
+            with open(history_file_path, "r") as file:
+                history = json.load(file)
+            # Prepend the system prompt to the existing history for this interaction
+            history["messages"] = [{"role": "system", "content": self.system_prompt}] + history["messages"]
         else:
-            return 'Error: Failed to fetch response from AI.'
+            # Initialize history with the system prompt if there's no history
+            history = {"messages": [{"role": "system", "content": self.system_prompt}]}
+    
+        # Construct the payload with the updated history including the system prompt
+        payload = {
+            "messages": history["messages"] + [{"role": "user", "content": user_content}],
+            "temperature": 0.7,
+            "max_tokens": 150,
+            "stream": False
+        }
+    
+        # Post request to AI endpoint with the constructed payload
+        async with self.session.post(self.ai_url, json=payload) as response:
+            if response.status == 200:
+                data = await response.json()
+                ai_response = data.get('choices', [{}])[0].get('message', {}).get('content', 'Error: Could not parse AI response.')
+                # Update chat history excluding the prepended system prompt for the next interactions
+                self.update_chat_history(user_id, user_content, ai_response)
+                return ai_response
+            else:
+                return 'Error: Failed to fetch response from AI.'
 
 
     @commands.command(name="ai")
